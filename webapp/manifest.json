@@ -137,7 +137,22 @@
           "options": {
             "settings": {
               "editableHeaderContent": false,
-              "contextPath": "/Grocery"
+              "contextPath": "/Grocery",
+              "controllerExtensions": {
+                "sap.fe.templates.ObjectPage.ObjectPageController": {
+                  "controllerName": "groceryproject.ext.ObjectPageExt"
+                }
+              },
+              "content": {
+                "header": {
+                  "actions": {
+                    "checkExpiration": {
+                      "text": "{i18n>checkExpiration}",
+                      "press": "onShowExpirationDays"
+                    }
+                  }
+                }
+              }
             }
           }
         }

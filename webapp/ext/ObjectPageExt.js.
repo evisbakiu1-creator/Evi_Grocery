@@ -1,0 +1,44 @@
+sap.ui.define([
+  "sap/m/Dialog", "sap/m/Text", "sap/m/Button"
+], function (Dialog, Text, Button) {
+  "use strict";
+
+  function toMidnightUTC(d) {
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  }
+
+  function openPopup(oView, sText) {
+    var dlg = new Dialog({
+      title: "Days Until Expiration",
+      content: new Text({ text: sText }),
+      beginButton: new Button({ text: "OK", press: function () { dlg.close(); } }),
+      afterClose: function () { dlg.destroy(); }
+    });
+    oView.addDependent(dlg);
+    dlg.open();
+  }
+
+  return {
+    onShowExpirationDays: function () {
+      var oView = this.getView();
+      var oCtx  = this.extensionAPI.getBindingContext();
+      if (!oCtx) { openPopup(oView, "No object selected."); return; }
+
+      // Change this if your OData field is different, e.g., "ExpirationDate"
+      var vDate = oCtx.getProperty("Expirationdate");
+      if (!vDate) { openPopup(oView, "No expiration date on this record."); return; }
+
+      var oExp = vDate instanceof Date ? vDate : new Date(vDate);
+      var oToday = new Date();
+      var diffDays = Math.round((toMidnightUTC(oExp) - toMidnightUTC(oToday)) / 86400000);
+
+      var msg = diffDays > 0
+        ? `Expires in ${diffDays} day${diffDays === 1 ? "" : "s"}`
+        : diffDays === 0
+          ? "Expires today"
+          : `Expired ${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? "" : "s"} ago`;
+
+      openPopup(oView, msg);
+    }
+  };
+});
